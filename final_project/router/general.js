@@ -65,7 +65,7 @@ const getBookByIsbn = (isbn) => {
         try {
             resolve(books[isbn]);
         } catch (err) {
-            reject(err);
+            reject("Error getting book by ISBN.");
         }
     });
 };
@@ -96,7 +96,7 @@ const getBooksByAuthor = (author) => {
             });
             resolve (booksWithAuthor);
         } catch (err) {
-            reject(err);
+            reject("Error getting book(s) by Author.");
         }
     });
 };
@@ -110,7 +110,7 @@ public_users.get('/author/:author', async function (req, res) {
         if (booksWithAuthor.length === 0){
             return res.status(404).send("Author not found.");
         } else {
-            return res.send(JSON.stringify(booksWithAuthor[0], null, 4));
+            return res.send(JSON.stringify(booksWithAuthor, null, 4));
         }
     } catch (err) {
         return res.status(500).send(err);
@@ -126,7 +126,7 @@ const getBooksByTitle = (title) => {
             });
             resolve (booksWithTitle);
         } catch (err) {
-            reject(err);
+            reject("Error getting book(s) by Title.");
         }
     });
 };
@@ -140,7 +140,7 @@ public_users.get('/title/:title', async function (req, res) {
         if (booksWithTitle.length === 0){
             return res.status(404).send("Title not found.");
         } else {
-            return res.send(JSON.stringify(booksWithTitle[0], null, 4));
+            return res.send(JSON.stringify(booksWithTitle, null, 4));
         }
     } catch (err) {
         return res.status(500).send(err);
