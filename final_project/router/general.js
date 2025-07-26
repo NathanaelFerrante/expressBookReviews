@@ -38,50 +38,113 @@ public_users.post("/register", (req, res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  return res.send(JSON.stringify(books,null,2));
+// Promise function to get the dictionary of books.
+const getBooks = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(books);
+        } catch (err) {
+            reject("Error getting books.");
+        }
+    });
+};
+
+// Get the book list available in the shop (using an async call to the promise function).
+public_users.get('/', async function (req, res) {
+    try {
+        const retreivedBooks = await getBooks();
+        return res.send(JSON.stringify(retreivedBooks, null, 4));
+    } catch (err) {
+        return res.status(500).send(err);
+    }
 });
 
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+// Promise function to get a book by ISBN.
+const getBookByIsbn = (isbn) => {
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(books[isbn]);
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+// Get book details based on ISBN (using an async call to the promise function).
+public_users.get('/isbn/:isbn',async function (req, res) {
   let isbn = req.params.isbn
 
-  if (!(isbn in books)) {
-        return res.status(404).send("ISBN not found.");
-  }
+  try {
+    const bookWithIsbn = await getBookByIsbn(isbn);
 
-  return res.send(JSON.stringify(books[isbn]));
+    if (bookWithIsbn) {
+        return res.send(JSON.stringify(bookWithIsbn, null, 4));
+    } else {
+        return res.status(404).send(`Book with ISBN not found.`);
+    }
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 });
-  
-// Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+
+// Promise function to get a book by author.
+const getBooksByAuthor = (author) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let booksWithAuthor = Object.values(books).filter(book => {
+                return book.author === author;
+            });
+            resolve (booksWithAuthor);
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+// Get book details based on author (using an async call to the promise function).
+public_users.get('/author/:author', async function (req, res) {
     let author = req.params.author
 
-    let booksWithAuthor = Object.values(books).filter(book => {
-        return book.author === author;
-    });
-
-    if (booksWithAuthor.length === 0){
-        return res.status(404).send("Author not found.");
+    try {
+        let booksWithAuthor = await getBooksByAuthor(author);
+        if (booksWithAuthor.length === 0){
+            return res.status(404).send("Author not found.");
+        } else {
+            return res.send(JSON.stringify(booksWithAuthor[0], null, 4));
+        }
+    } catch (err) {
+        return res.status(500).send(err);
     }
-
-    return res.send(JSON.stringify(booksWithAuthor,null,2));
 });
 
-// Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+// Promise function to get a book by author.
+const getBooksByTitle = (title) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let booksWithTitle = Object.values(books).filter(book => {
+                return book.title === title;
+            });
+            resolve (booksWithTitle);
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+// Get book details based on title (using an async call to the promise function).
+public_users.get('/title/:title', async function (req, res) {
     let title = req.params.title
 
-    let booksWithTitle = Object.values(books).filter(book => {
-        return book.title === title;
-    });
-
-    if (booksWithTitle.length === 0){
-        return res.status(404).send("Title not found.");
+    try {
+        let booksWithTitle = await getBooksByTitle(title);
+        if (booksWithTitle.length === 0){
+            return res.status(404).send("Title not found.");
+        } else {
+            return res.send(JSON.stringify(booksWithTitle[0], null, 4));
+        }
+    } catch (err) {
+        return res.status(500).send(err);
     }
-
-    return res.send(JSON.stringify(booksWithTitle,null,2));
 });
 
 //  Get book review
