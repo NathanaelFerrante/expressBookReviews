@@ -91,12 +91,24 @@ public_users.get('/isbn/:isbn',async function (req, res) {
 const getBooksByAuthor = (author) => {
     return new Promise((resolve, reject) => {
         try {
-            let booksWithAuthor = Object.values(books).filter(book => {
-                return book.author === author;
-            });
+            // Make a list of new book objects.
+            const booksWithAuthor = Object.entries(books)
+                // Use a filter to grab all books with a matching author.
+                // Passing '([isbn, book])' takes the default values from books (isbn key and book value) and assigns them to isbn and book.
+                .filter(([isbn, book]) => {
+                    return book.author === author
+                })
+                // Use a map to turn the filtered item into a new array.
+                // Passing '([isbn, book])' takes the default values from books (isbn key and book value) and assigns them to isbn and book.
+                // '...book,' will copy into the array all values from the book dict.
+                // '"isbn": isbn' will add the "isbn" key and the ISBN as the value.
+                .map(([isbn, book]) => ({
+                    ...book,
+                    "isbn": isbn
+                }));
             resolve (booksWithAuthor);
         } catch (err) {
-            reject("Error getting book(s) by Author.");
+            reject("Error getting book(s) by author.");
         }
     });
 };
@@ -121,12 +133,24 @@ public_users.get('/author/:author', async function (req, res) {
 const getBooksByTitle = (title) => {
     return new Promise((resolve, reject) => {
         try {
-            let booksWithTitle = Object.values(books).filter(book => {
-                return book.title === title;
-            });
+            // Make a list of new book objects.
+            const booksWithTitle = Object.entries(books)
+                // Use a filter to grab all books with a matching title.
+                // Passing '([isbn, book])' takes the default values from books (isbn key and book value) and assigns them to isbn and book.
+                .filter(([isbn, book]) => {
+                    return book.title === title
+                })
+                // Use a map to turn the filtered item into a new array.
+                // Passing '([isbn, book])' takes the default values from books (isbn key and book value) and assigns them to isbn and book.
+                // '...book,' will copy into the array all values from the book dict.
+                // '"isbn": isbn' will add the "isbn" key and the ISBN as the value.
+                .map(([isbn, book]) => ({
+                    ...book,
+                    "isbn": isbn
+                }));
             resolve (booksWithTitle);
         } catch (err) {
-            reject("Error getting book(s) by Title.");
+            reject("Error getting book(s) by title.");
         }
     });
 };
